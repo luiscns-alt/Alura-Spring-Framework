@@ -1,10 +1,12 @@
-import java.sql.*;
-import java.util.List;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class Listagem {
     public static void main(String[] args) throws SQLException {
-        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost/loja_virtual?useTimezone=true&serverTimezone=UTC", "pgsql", "pgpassword");
-
+        ConnectionFactory connectionFactory = new ConnectionFactory();
+        Connection connection = connectionFactory.RecuperarConexao();
         Statement stm = connection.createStatement();
         stm.execute("SELECT ID, NOME, DESCRICAO FROM PRODUTO");
 
