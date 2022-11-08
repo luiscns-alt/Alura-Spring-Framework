@@ -1,14 +1,11 @@
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 public class Listagem {
     public static void main(String[] args) throws SQLException {
         ConnectionFactory connectionFactory = new ConnectionFactory();
         Connection connection = connectionFactory.RecuperarConexao();
-        Statement stm = connection.createStatement();
-        stm.execute("SELECT ID, NOME, DESCRICAO FROM PRODUTO");
+        PreparedStatement stm = connection.prepareStatement("SELECT ID, NOME, DESCRICAO FROM PRODUTO");
+        stm.execute();
 
         ResultSet rst = stm.getResultSet();
 
