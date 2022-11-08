@@ -3,23 +3,20 @@ import java.sql.*;
 public class InsercaoComParametro {
     public static void main(String[] args) throws SQLException {
         ConnectionFactory factory = new ConnectionFactory();
-        Connection connection = factory.RecuperarConexao();
-        connection.setAutoCommit(false);
+        try (Connection connection = factory.RecuperarConexao()) {
 
-        try {
-            PreparedStatement stm = connection.prepareStatement("INSERT INTO PRODUTO (nome, descricao) VALUES (?,?)", Statement.RETURN_GENERATED_KEYS);
+            connection.setAutoCommit(false);
 
-            connection.commit();
+            try (PreparedStatement stm = connection.prepareStatement("INSERT INTO PRODUTO (nome, descricao) VALUES (?,?)", Statement.RETURN_GENERATED_KEYS)) {
+                AdicionarProduto("TV", "45pol", stm);
+                AdicionarProduto("Radio", "bateria", stm);
 
-            AdicionarProduto("TV", "45pol", stm);
-            AdicionarProduto("Radio", "bateria", stm);
-
-            stm.close();
-            connection.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("ROLLBACK EXECUTADO");
-            connection.rollback();
+                connection.commit();
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("ROLLBACK EXECUTADO");
+                connection.rollback();
+            }
         }
     }
 
@@ -33,12 +30,11 @@ public class InsercaoComParametro {
 
         stm.execute();
 
-        ResultSet rst = stm.getGeneratedKeys();
-
-        while (rst.next()) {
-            Integer id = rst.getInt(1);
-            System.out.println("ID criado: " + id);
+        try (ResultSet rst = stm.getGeneratedKeys()) {
+            while (rst.next()) {
+                Integer id = rst.getInt(1);
+                System.out.println("ID criado: " + id);
+            }
         }
-        rst.close();
     }
 }
