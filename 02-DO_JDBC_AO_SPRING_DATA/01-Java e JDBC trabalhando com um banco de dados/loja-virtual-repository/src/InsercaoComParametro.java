@@ -6,19 +6,30 @@ public class InsercaoComParametro {
         Connection connection = factory.RecuperarConexao();
         connection.setAutoCommit(false);
 
-        PreparedStatement stm = connection.prepareStatement("INSERT INTO PRODUTO (nome, descricao) VALUES (?,?)", Statement.RETURN_GENERATED_KEYS);
+        try {
+            PreparedStatement stm = connection.prepareStatement("INSERT INTO PRODUTO (nome, descricao) VALUES (?,?)", Statement.RETURN_GENERATED_KEYS);
 
-        AdicionarProduto("TV", "45pol", stm);
-        AdicionarProduto("Radio", "bateria", stm);
+            connection.commit();
+
+            AdicionarProduto("TV", "45pol", stm);
+            AdicionarProduto("Radio", "bateria", stm);
+
+            stm.close();
+            connection.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("ROLLBACK EXECUTADO");
+            connection.rollback();
+        }
     }
 
     private static void AdicionarProduto(String nome, String descricao, PreparedStatement stm) throws SQLException {
         stm.setString(1, nome);
         stm.setString(2, descricao);
 
-        if (nome.equals("Radio")){
-            throw new RuntimeException("Não foi possível adicionar o produto");
-        }
+//        if (nome.equals("Radio")){
+//            throw new RuntimeException("Não foi possível adicionar o produto");
+//        }
 
         stm.execute();
 
